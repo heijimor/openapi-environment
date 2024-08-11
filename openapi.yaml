@@ -1,84 +1,77 @@
 openapi: 3.0.0
 info:
-  title: Pet Store API
-  description: A simple API for managing pets.
+  title: Petstore API
+  description: API for managing pets
   version: 1.0.0
-
-servers:
-  - url: https://api.example.com/v1
-    description: The API server
-
 paths:
   /pets:
     get:
-      summary: List all pets
-      description: Retrieve a list of all pets.
+      summary: Retrieve a list of pets
+      description: Returns a list of all pets in the store.
       responses:
         "200":
-          description: A list of pets
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Pet"
-
+          $ref: "#/components/responses/PetListResponse"
     post:
-      summary: Create a pet
-      description: Add a new pet to the store.
+      summary: Add a new pet
+      description: Creates a new pet in the store.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Pet"
+              $ref: "#/components/schemas/Pet" # Use Pet schema for request body
       responses:
         "201":
-          description: Pet created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Pet"
-
-  /pets/{petId}:
-    get:
-      summary: Get a pet by ID
-      description: Retrieve details of a pet by its ID.
-      parameters:
-        - name: petId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: A pet object
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Pet"
-        "404":
-          description: Pet not found
+          $ref: "#/components/responses/PetCreatedResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
 
 components:
   schemas:
     Pet:
       type: object
-      required:
-        - id
-        - name
-        - status
       properties:
         id:
-          type: string
-          example: "123"
+          type: integer
+          example: 2
+          description: The unique identifier for the pet.
         name:
           type: string
-          example: "Fluffy"
-        status:
+          example: "Rex"
+          description: The name of the pet.
+        type:
           type: string
-          description: The status of the pet
-          enum:
-            - available
-            - pending
-            - sold
+          example: "Dog"
+          description: The type or species of the pet.
+    PetList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Pet"
+      description: A list of pet objects.
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid request body"
+          description: Error message indicating why the request failed.
+
+  responses:
+    PetListResponse:
+      description: A list of pets
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PetList"
+    PetCreatedResponse:
+      description: Pet created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Pet"
+    BadRequestResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
